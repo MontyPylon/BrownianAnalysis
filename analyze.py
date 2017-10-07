@@ -1,9 +1,9 @@
 class RemoveColumns:
 
-    OUTFILE = open("data/data-253.csv", 'r')
+    OUTFILE = open("data/data-313.csv", 'r')
     STARTSTRING = "data/particles/particle"
     ENDSTRING = ".csv"
-    ID = 61
+    ID = 147
 
     def main(self):
         currentLine = self.OUTFILE.readline()

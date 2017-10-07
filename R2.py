@@ -6,7 +6,7 @@ class R2:
     R = []
     Ri = []
     R2 = []
-    PARTICLES = 60
+    PARTICLES = 157
 
     def setupFiles(self):
         start = 'data/particles/particle'
