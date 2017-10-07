@@ -1,0 +1,3 @@
+startX   startY
+453      481
+
