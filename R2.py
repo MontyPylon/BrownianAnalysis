@@ -7,6 +7,9 @@ class R2:
     Ri = []
     R2 = []
     PARTICLES = 157
+    FILE_LENGTH = 500
+    PIXEL_CONVERSION = 1.0079*(10**(-7))
+    FPS = 30
 
     def setupFiles(self):
         start = 'data/particles/particle'
@@ -16,24 +19,29 @@ class R2:
             f = open(filename, 'r')
             self.INFILES.append(f)
 
+    def getLineNum(self, file):
+        return sum(1 for line in file)
+
     def findMinSet(self):
         min = 10000000000
         for i in range(len(self.INFILES)):
             num_lines = sum(1 for line in self.INFILES[i])
+            #print(str(num_lines))
             if num_lines < min:
                 min = num_lines
         return min
+
     def main(self):
         self.setupFiles()
         print("Starting to create R^2 data...")
 
         # Find the minimum data set length
-        min = self.findMinSet()
-        print("Minimum data set is " + str(min) + " long.")
+        #min = self.findMinSet()
+        #print("Minimum data set is " + str(min) + " long.")
 
-        for b in range(len(self.INFILES)):
-            self.INFILES[b].seek(0)
-
+        #for b in range(len(self.INFILES)):
+        #    self.INFILES[b].seek(0)
+        """        
         for i in range(len(self.INFILES)):
             for j in range(0, min):
                 dataRaw = self.INFILES[i].readline()
@@ -44,7 +52,24 @@ class R2:
                 self.Ri.append(x*x + y*y)
             self.R.append(self.Ri)
             self.Ri = []
+        """
 
+        for i in range(len(self.INFILES)):
+            fileLength = self.getLineNum(self.INFILES[i])
+            if(fileLength < self.FILE_LENGTH):
+                self.PARTICLES -= 1
+                continue
+            self.INFILES[i].seek(0)
+            for j in range(self.FILE_LENGTH):
+                dataRaw = self.INFILES[i].readline()
+                if not dataRaw: break
+                data = dataRaw.split(',')
+                x = float(data[0]) * self.PIXEL_CONVERSION
+                y = float(data[1].rstrip()) * self.PIXEL_CONVERSION
+                self.Ri.append(x * x + y * y)
+            self.R.append(self.Ri)
+            self.Ri = []
+        
         # Check to see if we have bad data
         ran = len(self.R)
         i = 0
@@ -55,7 +80,7 @@ class R2:
                 total += self.R[i][j]
                 counter += 1
             total = total / counter
-            if(total < 10):
+            if(total < 10*self.PIXEL_CONVERSION*self.PIXEL_CONVERSION):
                 print("----------------------")
                 print("Total: " + str(total))
                 print("Filename = particle" + str(i+1) + ".csv")
@@ -77,7 +102,7 @@ class R2:
         counter = 0
         f = open("data/results/result.csv", 'w')
         for a in range(len(self.R2)):
-            put = str(counter) + "," + str(self.R2[a]) + "\n"
+            put = str(counter/self.FPS) + "," + str(self.R2[a]) + "\n"
             f.write(put)
             counter += 1
         f.close()
